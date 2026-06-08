@@ -1,0 +1,61 @@
+services:
+  recommendation-service:
+    build: .
+    ports:
+      - "8000:8000"
+      - "4000:4000"
+    environment:
+      REST_PORT: 8000
+      GRAPHQL_PORT: 4000
+      DATABASE_URL: postgresql://user:password@postgres-rec:5432/recdb
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      RABBITMQ_EXCHANGE: student-survival-hub
+      USER_SERVICE_URL: http://user-service:3001
+      CAREER_SERVICE_URL: http://career-roadmap-service:3003
+      NODE_ENV: development
+    depends_on:
+      postgres-rec:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - survival-hub-net
+
+  postgres-rec:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: recdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_rec_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d recdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - survival-hub-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - survival-hub-net
+
+volumes:
+  postgres_rec_data:
+
+networks:
+  survival-hub-net:
+    driver: bridge

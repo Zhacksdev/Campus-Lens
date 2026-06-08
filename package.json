@@ -1,0 +1,26 @@
+{
+  "name": "recommendation-service",
+  "version": "1.0.0",
+  "description": "Campus Lens Recommendation Service",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "migrate": "node scripts/migrate.js",
+    "test:event": "node scripts/testPublishEvent.js ReviewSubmitted"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.11.3",
+    "amqplib": "^0.10.5",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "graphql": "^16.10.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
