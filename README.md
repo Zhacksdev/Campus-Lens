@@ -11,23 +11,6 @@
 
 ---
 
-# 📑 Daftar Isi
-
-* Tentang Campus Lens
-* Fitur Utama
-* Arsitektur Sistem
-* Detail Microservices
-* Event Driven Architecture
-* Flow Sistem
-* Stack Teknologi
-* Database Schema
-* Deployment
-* Testing Demo
-* Struktur Repository
-* Tim Pengembang
-
----
-
 # 🚀 Quick Overview
 
 Campus Lens merupakan platform berbasis microservices yang membantu mahasiswa mengambil keputusan akademik dan karier melalui pengalaman nyata dari senior.
