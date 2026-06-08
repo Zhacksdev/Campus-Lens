@@ -1,5 +1,5 @@
 # 🗺️ Service 3 — Career Roadmap Service
-**Student Survival Hub | Tugas Besar IAE 2025/2026**
+**Campus Lens | Tugas Besar IAE 2025/2026**
 
 ---
 
