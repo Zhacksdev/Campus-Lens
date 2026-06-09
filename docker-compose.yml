@@ -1,0 +1,47 @@
+services:
+  course-review-service:
+    build: .
+    ports: ["3002:3002"]
+    env_file: [.env]
+    environment:
+      DB_HOST: mysql-course
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      mysql-course:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks: [survival-hub-net]
+
+  mysql-course:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: coursedb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports: ["3306:3306"]
+    volumes: [mysql_course_data:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [survival-hub-net]
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports: ["5672:5672", "15672:15672"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [survival-hub-net]
+
+volumes:
+  mysql_course_data:
+
+networks:
+  survival-hub-net:
+    driver: bridge
