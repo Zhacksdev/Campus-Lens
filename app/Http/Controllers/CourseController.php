@@ -11,8 +11,8 @@ class CourseController extends Controller
     public function index(Request $request): JsonResponse
     {
         return response()->json(Course::query()
-            ->when($request->filled('major'), fn ($query) => $query->where('major', $request->string('major')))
-            ->when($request->filled('semester'), fn ($query) => $query->where('semester', $request->integer('semester')))
+            ->when($request->filled('major'), fn($query) => $query->where('major', $request->string('major')))
+            ->when($request->filled('semester'), fn($query) => $query->where('semester', $request->integer('semester')))
             ->withAvg('reviews', 'difficulty')->withCount('reviews')->paginate());
     }
 
