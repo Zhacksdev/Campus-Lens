@@ -1,0 +1,48 @@
+type Query {
+    careerPaths: [CareerPath!]! @all
+
+    careerRoadmap(
+        major: String!
+        careerGoal: String!
+    ): CareerPath
+    @field(resolver: "App\\GraphQL\\Queries\\CareerRoadmap")
+}
+type CareerPath {
+    id: ID!
+    name: String!
+    major: String!
+    description: String
+    phases: [RoadmapPhase!]! @hasMany
+    certifications: [Certification!]! @hasMany
+}
+
+type RoadmapPhase {
+    id: ID!
+    semester: Int!
+    focus: String!
+    activities: [PhaseActivity!]! @hasMany
+}
+
+type PhaseActivity {
+    id: ID!
+    type: String!
+    title: String!
+    description: String
+    priority: Int!
+}
+
+type Certification {
+    id: ID!
+    name: String!
+    provider: String
+    recommended_semester: Int!
+    url: String
+}
+type Mutation {
+    addCareerPath(
+        name: String!
+        major: String!
+        description: String
+    ): CareerPath
+    @field(resolver: "App\\GraphQL\\Mutations\\AddCareerPath")
+}

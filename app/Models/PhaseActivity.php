@@ -10,9 +10,13 @@ class PhaseActivity extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
-    protected $fillable = ['phase_id', 'type', 'title', 'description', 'priority'];
+    protected $fillable = [
+        'phase_id',
+        'type',
+        'title',
+        'description',
+        'priority'
+    ];
 
     public function phase(): BelongsTo
     {
