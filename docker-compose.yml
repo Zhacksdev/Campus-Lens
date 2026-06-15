@@ -1,0 +1,54 @@
+services:
+  user-service:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://user:password@postgres-user:5432/userdb
+      JWT_SECRET: ${JWT_SECRET:-supersecretkey123}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      NODE_ENV: development
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+    networks:
+      - survival-hub-net
+
+  postgres-user:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_user_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d userdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - survival-hub-net
+
+  hasura:
+    image: hasura/graphql-engine:v2.40.0
+    ports:
+      - "8080:8080"
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgresql://user:password@postgres-user:5432/userdb
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_ADMIN_SECRET:-hasuraadminsecret}
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"${JWT_SECRET:-supersecretkey123}"}'
+    depends_on:
+      postgres-user:
+        condition: service_healthy
+    networks:
+      - survival-hub-net
+
+volumes:
+  postgres_user_data:
+
+networks:
+  survival-hub-net:
+    driver: bridge
