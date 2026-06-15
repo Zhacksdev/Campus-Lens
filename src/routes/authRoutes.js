@@ -1,3 +1,4 @@
+// Campus Lens user service authentication routes.
 const express = require('express');
 const authController = require('../controllers/authController');
 

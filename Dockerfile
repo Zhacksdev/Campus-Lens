@@ -1,3 +1,4 @@
+# Campus Lens user service container image.
 FROM node:20-alpine
 
 WORKDIR /app

@@ -1,3 +1,4 @@
+// Campus Lens user service application entry point.
 require('dotenv').config();
 
 const express = require('express');

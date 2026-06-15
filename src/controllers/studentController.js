@@ -1,3 +1,4 @@
+// Campus Lens user service profile and activity handlers.
 const Student = require('../models/student');
 
 async function getProfile(req, res, next) {

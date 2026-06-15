@@ -1,3 +1,4 @@
+// Campus Lens user service JWT authentication middleware.
 const jwt = require('jsonwebtoken');
 
 function authenticateToken(req, res, next) {

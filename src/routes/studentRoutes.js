@@ -1,3 +1,4 @@
+// Campus Lens user service student routes.
 const express = require('express');
 const studentController = require('../controllers/studentController');
 const { authenticateToken, requireOwnerOrAdmin } = require('../middleware/auth');

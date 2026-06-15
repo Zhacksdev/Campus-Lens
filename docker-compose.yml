@@ -1,3 +1,4 @@
+# Campus Lens user service development stack.
 services:
   user-service:
     build: .

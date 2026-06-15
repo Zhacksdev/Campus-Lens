@@ -1,3 +1,4 @@
+// Campus Lens user service authentication handlers.
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Student = require('../models/student');

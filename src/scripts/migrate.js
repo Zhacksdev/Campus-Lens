@@ -1,3 +1,4 @@
+// Campus Lens user service database migration script.
 require('dotenv').config();
 
 const fs = require('fs/promises');

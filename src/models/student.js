@@ -1,3 +1,4 @@
+// Campus Lens user service student data access layer.
 const db = require('../config/db');
 
 const publicStudentFields = `

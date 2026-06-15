@@ -1,3 +1,4 @@
+// Campus Lens user service internal API routes.
 const express = require('express');
 const studentController = require('../controllers/studentController');
 
