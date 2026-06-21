@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Certification;
 use App\Models\CareerPath;
 
 class RoadmapController extends Controller
@@ -23,9 +24,19 @@ class RoadmapController extends Controller
 
     public function certifications(Request $request)
     {
-        return response()->json([
-            'message' => 'Certifications endpoint'
-        ]);
+        $career = trim((string) $request->query('career', ''));
+
+        $certifications = Certification::query()
+            ->with('careerPath:id,name,major')
+            ->when($career !== '', fn ($query) => $query->whereHas(
+                'careerPath',
+                fn ($careerQuery) => $careerQuery->where('name', $career)
+            ))
+            ->orderBy('recommended_semester')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($certifications);
     }
 
     public function storePhase(Request $request, $careerPath)
