@@ -1,14 +1,17 @@
 # Campus Lens user service development stack.
 services:
   user-service:
+    container_name: user-service
+    restart: unless-stopped
     build: .
     ports:
       - "3001:3001"
     environment:
       DATABASE_URL: postgresql://user:password@postgres-user:5432/userdb
-      JWT_SECRET: ${JWT_SECRET:-supersecretkey123}
+      JWT_SECRET: ${JWT_SECRET:-supersecretkey123supersecretkey123}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       NODE_ENV: development
+    command: sh -c "node src/scripts/seed.js && node src/index.js"
     depends_on:
       postgres-user:
         condition: service_healthy
@@ -16,6 +19,8 @@ services:
       - survival-hub-net
 
   postgres-user:
+    container_name: user-db
+    restart: unless-stopped
     image: postgres:15-alpine
     environment:
       POSTGRES_DB: userdb
@@ -33,6 +38,8 @@ services:
       - survival-hub-net
 
   hasura:
+    container_name: user-hasura
+    restart: unless-stopped
     image: hasura/graphql-engine:v2.40.0
     ports:
       - "8080:8080"
@@ -40,10 +47,33 @@ services:
       HASURA_GRAPHQL_DATABASE_URL: postgresql://user:password@postgres-user:5432/userdb
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_ADMIN_SECRET:-hasuraadminsecret}
-      HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"${JWT_SECRET:-supersecretkey123}"}'
+      HASURA_GRAPHQL_JWT_SECRET: '{"type":"HS256","key":"${JWT_SECRET:-supersecretkey123supersecretkey123}"}'
     depends_on:
       postgres-user:
         condition: service_healthy
+    networks:
+      - survival-hub-net
+
+  hasura-metadata:
+    container_name: user-hasura-metadata
+    image: curlimages/curl:8.11.1
+    restart: "no"
+    depends_on:
+      hasura:
+        condition: service_healthy
+    volumes:
+      - ./hasura/metadata.json:/metadata/metadata.json:ro
+    command:
+      - -fsS
+      - -X
+      - POST
+      - http://hasura:8080/v1/metadata
+      - -H
+      - "Content-Type: application/json"
+      - -H
+      - "x-hasura-admin-secret: ${HASURA_ADMIN_SECRET:-hasuraadminsecret}"
+      - --data-binary
+      - "@/metadata/metadata.json"
     networks:
       - survival-hub-net
 

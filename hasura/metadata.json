@@ -1,0 +1,57 @@
+{
+  "type": "replace_metadata",
+  "args": {
+    "version": 3,
+    "sources": [
+      {
+        "name": "default",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "schema": "public",
+              "name": "students"
+            },
+            "array_relationships": [
+              {
+                "name": "activities",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "table": {
+                      "schema": "public",
+                      "name": "student_activities"
+                    },
+                    "column": "student_id"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "student_activities"
+            },
+            "object_relationships": [
+              {
+                "name": "student",
+                "using": {
+                  "foreign_key_constraint_on": "student_id"
+                }
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": {
+              "from_env": "HASURA_GRAPHQL_DATABASE_URL"
+            },
+            "isolation_level": "read-committed",
+            "use_prepared_statements": true
+          }
+        }
+      }
+    ]
+  }
+}
