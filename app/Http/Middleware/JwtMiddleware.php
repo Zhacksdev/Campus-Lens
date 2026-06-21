@@ -22,7 +22,7 @@ class JwtMiddleware
         $header = $this->decode($headerPart);
         $payload = $this->decode($payloadPart);
         $expected = $this->encode(hash_hmac('sha256', "$headerPart.$payloadPart", $secret, true));
-        $studentId = $payload['student_id'] ?? $payload['sub'] ?? null;
+        $studentId = $payload['student_id'] ?? $payload['sub'] ?? $payload['id'] ?? null;
 
         if (($header['alg'] ?? null) !== 'HS256'
             || ! hash_equals($expected, $signature)

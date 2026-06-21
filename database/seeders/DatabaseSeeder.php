@@ -15,30 +15,37 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $lecturer = Lecturer::create([
-            'name' => 'Dr. Budi Santoso', 'email' => 'budi@campus.ac.id', 'teaching_style' => 'Praktis',
-        ]);
-        Lecturer::create([
-            'name' => 'Siti Rahma, M.Kom.', 'email' => 'siti@campus.ac.id', 'teaching_style' => 'Interaktif',
-        ]);
-        $course = Course::create([
-            'code' => 'IF301', 'name' => 'Integrasi Aplikasi Sistem', 'credits' => 3,
-            'major' => 'Informatika', 'semester' => 4,
-        ]);
-        Course::create([
-            'code' => 'IF302', 'name' => 'Rekayasa Perangkat Lunak', 'credits' => 3,
-            'major' => 'Informatika', 'semester' => 4,
-        ]);
-        Course::create([
-            'code' => 'SI201', 'name' => 'Analisis Proses Bisnis', 'credits' => 3,
-            'major' => 'Sistem Informasi', 'semester' => 3,
-        ]);
-        CourseReview::create([
-            'course_id' => $course->id, 'lecturer_id' => $lecturer->id, 'student_id' => 'seed-student',
-            'difficulty' => 7, 'teaching_rating' => 8, 'tips' => 'Pelajari kontrak API dan latihan Docker.',
-            'uts_strategy' => 'Pahami integrasi sinkron dan asinkron.',
-            'uas_strategy' => 'Latihan implementasi service end-to-end.',
-            'semester_taken' => 4, 'academic_year' => '2025/2026',
-        ]);
+        $lecturer = Lecturer::updateOrCreate(
+            ['email' => 'budi@campuslens.test'],
+            ['name' => 'Dr. Budi Santoso', 'teaching_style' => 'Practical']
+        );
+        Lecturer::updateOrCreate(
+            ['email' => 'siti@campuslens.test'],
+            ['name' => 'Siti Rahma, M.Kom.', 'teaching_style' => 'Interactive']
+        );
+
+        $course = Course::updateOrCreate(
+            ['code' => 'IF301'],
+            ['name' => 'Enterprise Application Integration', 'credits' => 3, 'major' => 'Informatics', 'semester' => 4]
+        );
+        Course::updateOrCreate(
+            ['code' => 'IF302'],
+            ['name' => 'Software Engineering', 'credits' => 3, 'major' => 'Informatics', 'semester' => 4]
+        );
+        Course::updateOrCreate(
+            ['code' => 'SI201'],
+            ['name' => 'Business Process Analysis', 'credits' => 3, 'major' => 'Information Systems', 'semester' => 3]
+        );
+
+        CourseReview::updateOrCreate(
+            ['course_id' => $course->id, 'student_id' => 'b3b7cb5e-9d9e-4df9-8d2c-7f30c1a8d101'],
+            [
+                'lecturer_id' => $lecturer->id, 'difficulty' => 7, 'teaching_rating' => 8,
+                'tips' => 'Review API contracts and practice Docker.',
+                'uts_strategy' => 'Understand synchronous and asynchronous integration.',
+                'uas_strategy' => 'Practice an end-to-end service implementation.',
+                'semester_taken' => 4, 'academic_year' => '2025/2026',
+            ]
+        );
     }
 }

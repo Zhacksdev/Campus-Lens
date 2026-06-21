@@ -16,13 +16,25 @@ class CourseController extends Controller
             ->withAvg('reviews', 'difficulty')->withCount('reviews')->paginate());
     }
 
-    public function show(Course $course): JsonResponse
+    public function show(Request $request, $course): JsonResponse
     {
+        $course = Course::find($course);
+
+        if (! $course) {
+            return response()->json(['message' => 'Course not found.'], 404);
+        }
+
         return response()->json($course->loadAvg('reviews', 'difficulty')->loadCount('reviews'));
     }
 
-    public function reviews(Course $course): JsonResponse
+    public function reviews(Request $request, $course): JsonResponse
     {
+        $course = Course::find($course);
+
+        if (! $course) {
+            return response()->json(['message' => 'Course not found.'], 404);
+        }
+
         return response()->json($course->reviews()->with('lecturer')->latest()->paginate());
     }
 

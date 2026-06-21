@@ -30,6 +30,7 @@ class ReviewController extends Controller
         if (abs($newAverage - $previousAverage) > 0.5) {
             $this->publisher->publish('DifficultyScoreUpdated', [
                 'course_id' => $course->id, 'course_code' => $course->code,
+                'student_id' => $review->student_id,
                 'new_avg_difficulty' => round($newAverage, 2),
                 'previous_avg_difficulty' => round($previousAverage, 2),
                 'total_reviews' => $course->reviews()->count(),
@@ -47,7 +48,21 @@ class ReviewController extends Controller
     public function update(Request $request, CourseReview $review): JsonResponse
     {
         abort_unless($review->student_id === $request->attributes->get('student_id'), 403);
+        $course = $review->course;
+        $previousAverage = (float) ($course->reviews()->avg('difficulty') ?? 0);
         $review->update($this->validated($request, true));
+        $newAverage = (float) $course->reviews()->avg('difficulty');
+
+        if ($review->wasChanged('difficulty')) {
+            $this->publisher->publish('DifficultyScoreUpdated', [
+                'course_id' => $course->id,
+                'course_code' => $course->code,
+                'student_id' => $review->student_id,
+                'new_avg_difficulty' => round($newAverage, 2),
+                'previous_avg_difficulty' => round($previousAverage, 2),
+                'total_reviews' => $course->reviews()->count(),
+            ]);
+        }
 
         return response()->json($review->fresh(['course', 'lecturer']));
     }

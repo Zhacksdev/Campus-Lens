@@ -1,11 +1,14 @@
 services:
   course-review-service:
+    container_name: course-review-service
+    restart: unless-stopped
     build: .
     ports: ["3002:3002"]
     env_file: [.env]
     environment:
       DB_HOST: mysql-course
       RABBITMQ_HOST: rabbitmq
+    command: sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=3002"
     depends_on:
       mysql-course:
         condition: service_healthy
@@ -14,6 +17,8 @@ services:
     networks: [survival-hub-net]
 
   mysql-course:
+    container_name: course-review-db
+    restart: unless-stopped
     image: mysql:8.0
     environment:
       MYSQL_DATABASE: coursedb
@@ -23,15 +28,27 @@ services:
     ports: ["3306:3306"]
     volumes: [mysql_course_data:/var/lib/mysql]
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "-ppassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "user", "-ppassword"]
+      start_period: 600s
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 60
     networks: [survival-hub-net]
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    container_name: course-review-rabbitmq
+    restart: unless-stopped
+    image: rabbitmq:3-management
+    entrypoint:
+      - sh
+      - -c
+      - |
+        printf '%s' "$${RABBITMQ_ERLANG_COOKIE:-campuslenscookie}" > /var/lib/rabbitmq/.erlang.cookie
+        chown -R rabbitmq:rabbitmq /var/lib/rabbitmq
+        chmod 400 /var/lib/rabbitmq/.erlang.cookie
+        exec gosu rabbitmq rabbitmq-server
     ports: ["5672:5672", "15672:15672"]
+    volumes: [rabbitmq_data:/var/lib/rabbitmq]
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 5s
@@ -41,6 +58,7 @@ services:
 
 volumes:
   mysql_course_data:
+  rabbitmq_data:
 
 networks:
   survival-hub-net:
